@@ -1,0 +1,27 @@
+{
+  "name": "ijas-2026-awards",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 5176",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 5176",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "motion": "^14.5.0",
+    "next": "^15.5.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "oxlint": "^1.81.0"
+  }
+}
