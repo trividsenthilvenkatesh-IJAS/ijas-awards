@@ -2,36 +2,62 @@
 
 import PageHero from "@/components/PageHero";
 import YearTabs from "@/components/YearTabs";
-import { projectsForYear } from "@/data/exposition";
-import { buildAwardSections, displayName, gradeLabel, parseDollars } from "@/lib/awardValue";
+import { getProject, listed, presenterLine, projectsForYear, studentLine } from "@/data/projects";
 import usePageTitle from "@/hooks/usePageTitle";
+import { buildAwardSections, headingValue } from "@/lib/awardValue";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
-function headingValue(name) {
-  const dollars = parseDollars(name);
-  if (dollars == null) return "";
-  if (name.includes("$")) return "";
-  return ` · $${dollars.toLocaleString("en-US")}`;
+function matchesQuery(project, awardName, query) {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return true;
+  return [awardName, project.title, studentLine(project), project.category, project.school, project.region]
+    .join("\n")
+    .toLowerCase()
+    .includes(needle);
 }
 
 export default function AwardsByValue() {
   const [year, setYear] = useState(2026);
-  usePageTitle("Awards by Value");
+  const [query, setQuery] = useState("");
+  usePageTitle("Awards");
   const sections = useMemo(() => buildAwardSections(projectsForYear(year)), [year]);
+  const visible = useMemo(
+    () =>
+      sections
+        .map((section) => ({
+          ...section,
+          projects: section.projects.filter((project) => matchesQuery(project, section.name, query)),
+        }))
+        .filter((section) => section.projects.length > 0),
+    [sections, query],
+  );
 
   return (
     <>
-      <PageHero title="Awards by Value" />
+      <PageHero title="Awards" />
       <YearTabs year={year} onChange={setYear} controlsId="awards-by-value" />
       <div id="awards-by-value" className="mx-auto max-w-[1100px] px-5 py-10 md:px-8 md:py-12">
-        <p className="mb-8 max-w-[760px] text-[16px] leading-relaxed text-[#374151]">
-          Special awards from the {year} State Exposition, ordered from the highest known dollar value to Gold.
-          Thermo Fisher and ISEF Finalists stay with the high-value awards. A student is listed under each award they
-          received. Pure Gold is at the bottom. Silver, bronze, and participation placements appear only when they also
-          received a special award.
+        <p className="max-w-[760px] text-[16px] leading-relaxed text-[#374151]">
+          Awards from the {year} State Exposition are ordered by award value. Within each award, projects are listed by
+          region, school, and category.
         </p>
+        <label htmlFor="award-value-search" className="mb-8 mt-6 block max-w-[760px] text-[13px] font-semibold text-ijas-navy">
+          Search
+          <input
+            id="award-value-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Award, title, student, category, school, or region"
+            className="mt-1 w-full rounded-md border border-[#d1d5db] bg-white px-3 py-2 text-[15px] font-normal text-ijas-ink"
+          />
+        </label>
         <div className="space-y-10">
-          {sections.map((section) => (
+          {visible.length === 0 ? (
+            <p className="text-[16px] leading-relaxed text-[#374151]">No projects match this search.</p>
+          ) : null}
+          {visible.map((section) => (
             <section key={section.id} aria-labelledby={`award-${section.id}`}>
               <h2
                 id={`award-${section.id}`}
@@ -44,28 +70,40 @@ export default function AwardsByValue() {
                 </span>
               </h2>
               <ul className="mt-4 divide-y divide-[#e5e7eb] border-b border-[#e5e7eb]">
-                {section.projects.map((project) => {
-                  const name = displayName(project) || "Name not listed";
-                  const grade = gradeLabel(project);
-                  return (
-                    <li key={`${section.id}-${project.year}-${project.projectNumber}-${project.title}-${name}`} className="py-3">
-                      <p className="text-[16px] font-semibold text-[#1f2937]">
-                        {name}
-                        {grade ? <span className="font-normal text-[#4b5563]"> · {grade}</span> : null}
-                      </p>
+                {section.projects.map((project) => (
+                  <li key={`${section.id}-${project.id}`} className="py-3">
+                    <p className="text-[15px] leading-snug">
+                      <ProjectTitle project={project} />
+                      <span className="text-[14px] font-normal text-[#374151]">
+                        {" "}
+                        ⋅ {listed(project.category, "Category not listed")}
+                      </span>
+                    </p>
+                    <div className="pl-5">
+                      <p className="mt-0.5 text-[14px] text-[#374151]">{presenterLine(project) || "Name not listed"}</p>
                       <p className="mt-0.5 text-[14px] text-[#374151]">
-                        {[project.school || "School not listed", project.category || "Category not listed", project.region || "Region not listed"]
-                          .join(" · ")}
+                        {listed(project.school, "School not listed")} · {listed(project.region, "Region not listed")}
                       </p>
-                      <p className="mt-0.5 text-[15px] text-ijas-navy">{project.title || "Title not listed"}</p>
-                    </li>
-                  );
-                })}
+                    </div>
+                  </li>
+                ))}
               </ul>
             </section>
           ))}
         </div>
       </div>
     </>
+  );
+}
+
+function ProjectTitle({ project }) {
+  const profile = getProject(project.id);
+  const title = project.title || "Title not listed";
+  const className = "font-semibold text-ijas-navy hover:underline";
+  if (!profile) return <span className={className}>{title}</span>;
+  return (
+    <Link href={`/projects/${profile.id}/`} className={className}>
+      {title}
+    </Link>
   );
 }

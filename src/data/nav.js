@@ -1,12 +1,12 @@
 export const primaryNav = [
   { label: "Awards & Results", to: "/awards" },
-  { label: "Awards by Value", to: "/awards-by-value" },
+  { label: "Awards", to: "/awards-by-value" },
   { label: "Project Database", to: "/projects" },
 ];
 
 export const footerPageLinks = [
   { label: "Awards & Results", to: "/awards" },
-  { label: "Awards by Value", to: "/awards-by-value" },
+  { label: "Awards", to: "/awards-by-value" },
   { label: "Project Database", to: "/projects" },
 ];
 
@@ -21,7 +21,7 @@ export const socialLinks = [
 
 export const searchPages = [
   { label: "Awards & Results", to: "/awards", keywords: "awards results epic gold special 2025 2026" },
-  { label: "Awards by Value", to: "/awards-by-value", keywords: "awards value thermo fisher isef scholarship gold" },
+  { label: "Awards", to: "/awards-by-value", keywords: "awards value thermo fisher isef scholarship gold" },
   { label: "Project Database", to: "/projects", keywords: "project database search finalists table" },
 ];
 
