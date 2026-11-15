@@ -2,3 +2,12 @@ node_modules
 .next
 out
 .DS_Store
+
+# Secrets (never commit)
+.env
+.env.*
+.env*.local
+!.env.example
+
+# Static export staging
+.static-build
