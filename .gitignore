@@ -11,3 +11,6 @@ out
 
 # Static export staging
 .static-build
+
+# Smart search index (generated from data/live-projects.json by scripts/build-embeddings.mjs)
+public/search/
